@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { NavLink } from "@/components/NavLink";
 import { LanguageToggle } from "@/components/LanguageToggle";
@@ -30,15 +32,34 @@ import { Button } from "@/components/ui/button";
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const { role, profile, signOut } = useAuth();
+  const { role, profile, user, signOut } = useAuth();
   const sidebar = useSidebar();
   const collapsed = sidebar.state === "collapsed";
 
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["unread-notifications-count", user?.id, role],
+    queryFn: async () => {
+      let query = supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("is_read", false);
+
+      if (role === "client") {
+        query = query.eq("recipient_user_id", user!.id);
+      }
+
+      const { count, error } = await query;
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user,
+    refetchInterval: 30000,
+  });
   const clientItems = [
     { title: t("nav.dashboard"), url: "/dashboard", icon: LayoutDashboard },
     { title: t("nav.orders"), url: "/orders", icon: ClipboardList },
     { title: t("nav.documents"), url: "/documents", icon: FileText },
-    { title: t("nav.notifications"), url: "/notifications", icon: Bell },
+    { title: t("nav.notifications"), url: "/notifications", icon: Bell, badge: unreadCount },
   ];
 
   const opsItems = [
@@ -92,7 +113,12 @@ export function AppSidebar() {
                       activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && <span className="flex-1">{item.title}</span>}
+                      {"badge" in item && (item as any).badge > 0 && (
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium px-1">
+                          {(item as any).badge}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

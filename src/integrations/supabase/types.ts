@@ -100,6 +100,7 @@ export type Database = {
           entity_type: string | null
           error_message: string | null
           id: string
+          is_read: boolean
           notification_type: string
           recipient_email: string
           recipient_user_id: string | null
@@ -114,6 +115,7 @@ export type Database = {
           entity_type?: string | null
           error_message?: string | null
           id?: string
+          is_read?: boolean
           notification_type: string
           recipient_email: string
           recipient_user_id?: string | null
@@ -128,6 +130,7 @@ export type Database = {
           entity_type?: string | null
           error_message?: string | null
           id?: string
+          is_read?: boolean
           notification_type?: string
           recipient_email?: string
           recipient_user_id?: string | null
