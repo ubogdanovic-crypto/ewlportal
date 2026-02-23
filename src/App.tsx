@@ -15,6 +15,12 @@ import OrdersList from "./pages/OrdersList";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
 import CandidateReview from "./pages/CandidateReview";
+import OpsClients from "./pages/OpsClients";
+import OpsClientDetail from "./pages/OpsClientDetail";
+import OpsOrders from "./pages/OpsOrders";
+import OpsOrderDetail from "./pages/OpsOrderDetail";
+import OpsWorkers from "./pages/OpsWorkers";
+import OpsWorkerProfile from "./pages/OpsWorkerProfile";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -88,6 +94,36 @@ const App = () => (
             <Route path="/ops" element={
               <ProtectedRoute allowedRoles={["ops", "management"]}>
                 <OpsDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/clients" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsClients />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/clients/:id" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsClientDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/orders" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsOrders />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/orders/:id" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsOrderDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/workers" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsWorkers />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/workers/:id" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsWorkerProfile />
               </ProtectedRoute>
             } />
 

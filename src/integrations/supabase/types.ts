@@ -62,6 +62,36 @@ export type Database = {
         }
         Relationships: []
       }
+      internal_notes: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           accommodation_address: string | null
@@ -247,6 +277,50 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      protek_communication_log: {
+        Row: {
+          channel: string
+          contact_person: string | null
+          content: string
+          created_at: string
+          created_by: string
+          direction: string
+          id: string
+          order_id: string
+          subject: string | null
+        }
+        Insert: {
+          channel: string
+          contact_person?: string | null
+          content?: string
+          created_at?: string
+          created_by: string
+          direction: string
+          id?: string
+          order_id: string
+          subject?: string | null
+        }
+        Update: {
+          channel?: string
+          contact_person?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string
+          direction?: string
+          id?: string
+          order_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "protek_communication_log_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
