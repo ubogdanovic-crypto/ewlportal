@@ -1,4 +1,7 @@
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,12 +11,33 @@ import { ClipboardList, Users, AlertCircle, CheckCircle2, Plus } from "lucide-re
 export default function ClientDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { profile } = useAuth();
+
+  const { data } = useQuery({
+    queryKey: ["client-dashboard-stats", profile?.company_id],
+    queryFn: async () => {
+      const [ordersRes, workersRes] = await Promise.all([
+        supabase.from("orders").select("id, status").eq("company_id", profile!.company_id!),
+        supabase.from("workers").select("id, status, current_stage").eq("company_id", profile!.company_id!),
+      ]);
+      return { orders: ordersRes.data || [], workers: workersRes.data || [] };
+    },
+    enabled: !!profile?.company_id,
+  });
+
+  const orders = data?.orders || [];
+  const workers = data?.workers || [];
+
+  const activeOrders = orders.filter((o: any) => !["fulfilled", "cancelled", "draft"].includes(o.status)).length;
+  const activeWorkers = workers.filter((w: any) => w.status === "active").length;
+  const pendingReview = workers.filter((w: any) => w.status === "active" && w.current_stage === "client_review").length;
+  const arrived = workers.filter((w: any) => w.current_stage === "arrived" && w.status === "active").length;
 
   const stats = [
-    { label: t("dashboard.activeOrders"), value: "0", icon: ClipboardList, color: "text-info" },
-    { label: t("dashboard.workersInPipeline"), value: "0", icon: Users, color: "text-accent" },
-    { label: t("dashboard.pendingActions"), value: "0", icon: AlertCircle, color: "text-warning" },
-    { label: t("dashboard.workersArrived"), value: "0", icon: CheckCircle2, color: "text-success" },
+    { label: t("dashboard.activeOrders"), value: activeOrders, icon: ClipboardList, color: "text-info" },
+    { label: t("dashboard.workersInPipeline"), value: activeWorkers, icon: Users, color: "text-accent" },
+    { label: t("dashboard.pendingActions"), value: pendingReview, icon: AlertCircle, color: "text-warning" },
+    { label: t("dashboard.workersArrived"), value: arrived, icon: CheckCircle2, color: "text-success" },
   ];
 
   return (
@@ -31,9 +55,7 @@ export default function ClientDashboard() {
           {stats.map((stat) => (
             <Card key={stat.label}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.label}
-                </CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </CardHeader>
               <CardContent>
@@ -43,7 +65,6 @@ export default function ClientDashboard() {
           ))}
         </div>
 
-        {/* Placeholder sections for later phases */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">{t("dashboard.recentNotifications")}</CardTitle>
