@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.signwell-webhook]
 verify_jwt = false
+
+[functions.generate-document]
+verify_jwt = false
