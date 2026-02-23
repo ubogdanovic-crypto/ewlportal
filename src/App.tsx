@@ -23,6 +23,7 @@ import OpsOrders from "./pages/OpsOrders";
 import OpsOrderDetail from "./pages/OpsOrderDetail";
 import OpsWorkers from "./pages/OpsWorkers";
 import OpsWorkerProfile from "./pages/OpsWorkerProfile";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -90,6 +91,11 @@ const App = () => (
             <Route path="/candidates/:id/review" element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <CandidateReview />
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Notifications />
               </ProtectedRoute>
             } />
 
