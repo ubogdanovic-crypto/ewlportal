@@ -25,6 +25,8 @@ import OpsWorkers from "./pages/OpsWorkers";
 import OpsWorkerProfile from "./pages/OpsWorkerProfile";
 import Notifications from "./pages/Notifications";
 import ClientDocuments from "./pages/ClientDocuments";
+import OpsInterviews from "./pages/OpsInterviews";
+import OpsDocuments from "./pages/OpsDocuments";
 import ManagementSettings from "./pages/ManagementSettings";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -139,6 +141,16 @@ const App = () => (
             <Route path="/ops/workers/:id" element={
               <ProtectedRoute allowedRoles={["ops", "management"]}>
                 <OpsWorkerProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/interviews" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsInterviews />
+              </ProtectedRoute>
+            } />
+            <Route path="/ops/documents" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <OpsDocuments />
               </ProtectedRoute>
             } />
 
