@@ -172,12 +172,12 @@ export default function OpsWorkerProfile() {
     <AppLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/ops/workers")}>
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate("/ops/workers")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">{worker.first_name} {worker.last_name}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold truncate">{worker.first_name} {worker.last_name}</h1>
             <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
               <span>{(worker.orders as any)?.reference_number}</span>
               <span>·</span>
