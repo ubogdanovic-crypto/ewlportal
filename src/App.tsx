@@ -11,6 +11,9 @@ import ResetPassword from "./pages/ResetPassword";
 import ClientDashboard from "./pages/ClientDashboard";
 import OpsDashboard from "./pages/OpsDashboard";
 import ManagementDashboard from "./pages/ManagementDashboard";
+import OrdersList from "./pages/OrdersList";
+import NewOrder from "./pages/NewOrder";
+import OrderDetail from "./pages/OrderDetail";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -58,6 +61,21 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute allowedRoles={["client"]}>
                 <ClientDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <OrdersList />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders/new" element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <NewOrder />
+              </ProtectedRoute>
+            } />
+            <Route path="/orders/:id" element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <OrderDetail />
               </ProtectedRoute>
             } />
 

@@ -62,6 +62,110 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          accommodation_address: string | null
+          accommodation_provided: boolean | null
+          accommodation_type: string | null
+          additional_skills: string | null
+          company_id: string
+          confirmed_at: string | null
+          contract_duration_months: number | null
+          created_at: string
+          created_by: string
+          education_level: string | null
+          experience_years: number | null
+          id: string
+          job_description: string | null
+          meals_provided: boolean | null
+          monthly_salary_eur: number | null
+          notes: string | null
+          number_of_workers: number
+          other_benefits: string | null
+          position_title: string
+          reference_number: string
+          requirements: string | null
+          serbian_language_required: boolean | null
+          source_country: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          submitted_at: string | null
+          transportation_provided: boolean | null
+          updated_at: string
+          work_schedule: string | null
+        }
+        Insert: {
+          accommodation_address?: string | null
+          accommodation_provided?: boolean | null
+          accommodation_type?: string | null
+          additional_skills?: string | null
+          company_id: string
+          confirmed_at?: string | null
+          contract_duration_months?: number | null
+          created_at?: string
+          created_by: string
+          education_level?: string | null
+          experience_years?: number | null
+          id?: string
+          job_description?: string | null
+          meals_provided?: boolean | null
+          monthly_salary_eur?: number | null
+          notes?: string | null
+          number_of_workers?: number
+          other_benefits?: string | null
+          position_title?: string
+          reference_number: string
+          requirements?: string | null
+          serbian_language_required?: boolean | null
+          source_country?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          submitted_at?: string | null
+          transportation_provided?: boolean | null
+          updated_at?: string
+          work_schedule?: string | null
+        }
+        Update: {
+          accommodation_address?: string | null
+          accommodation_provided?: boolean | null
+          accommodation_type?: string | null
+          additional_skills?: string | null
+          company_id?: string
+          confirmed_at?: string | null
+          contract_duration_months?: number | null
+          created_at?: string
+          created_by?: string
+          education_level?: string | null
+          experience_years?: number | null
+          id?: string
+          job_description?: string | null
+          meals_provided?: boolean | null
+          monthly_salary_eur?: number | null
+          notes?: string | null
+          number_of_workers?: number
+          other_benefits?: string | null
+          position_title?: string
+          reference_number?: string
+          requirements?: string | null
+          serbian_language_required?: boolean | null
+          source_country?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          submitted_at?: string | null
+          transportation_provided?: boolean | null
+          updated_at?: string
+          work_schedule?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_id: string | null
@@ -147,6 +251,14 @@ export type Database = {
     }
     Enums: {
       app_role: "client" | "ops" | "management"
+      order_status:
+        | "draft"
+        | "submitted"
+        | "confirmed"
+        | "sourcing"
+        | "in_progress"
+        | "fulfilled"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -275,6 +387,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["client", "ops", "management"],
+      order_status: [
+        "draft",
+        "submitted",
+        "confirmed",
+        "sourcing",
+        "in_progress",
+        "fulfilled",
+        "cancelled",
+      ],
     },
   },
 } as const
