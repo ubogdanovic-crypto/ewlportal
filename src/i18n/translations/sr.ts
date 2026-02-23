@@ -343,5 +343,13 @@ export const sr = {
     rejectionReasonPrompt: "Unesite razlog odbijanja:",
     customDocLabel: "Unesite naziv dokumenta:",
     addCustom: "Dodaj dokument",
+    sendForSigning: "Pošalji na potpis",
+    sentForSigning: "Poslato na potpis!",
+    signing_none: "Nije poslato",
+    signing_sent: "Poslato na potpis",
+    signing_viewed: "Pregledano",
+    signing_signed: "Potpisano",
+    signing_declined: "Odbijeno",
+    signing_expired: "Isteklo",
   },
 };

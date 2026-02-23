@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Upload, Download, Check, X, FileText, Loader2, Trash2, Plus } from "lucide-react";
+import { Upload, Download, Check, X, FileText, Loader2, Trash2, Plus, PenTool } from "lucide-react";
 import { format } from "date-fns";
 
 const DOCUMENT_TYPES = [
@@ -159,6 +159,26 @@ export function WorkerDocuments({ workerId, readOnly = false }: WorkerDocumentsP
     queryClient.invalidateQueries({ queryKey: ["worker-documents", workerId] });
   };
 
+  const [sendingSignId, setSendingSignId] = useState<string | null>(null);
+
+  const handleSendForSigning = async (docId: string) => {
+    setSendingSignId(docId);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      const res = await supabase.functions.invoke("send-for-signing", {
+        body: { documentId: docId },
+      });
+      if (res.error) throw new Error(res.error.message);
+      toast.success(t("docs.sentForSigning" as any));
+      queryClient.invalidateQueries({ queryKey: ["worker-documents", workerId] });
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setSendingSignId(null);
+    }
+  };
+
   if (isLoading) {
     return <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
   }
@@ -221,6 +241,13 @@ export function WorkerDocuments({ workerId, readOnly = false }: WorkerDocumentsP
                   {t(`docs.status_${doc.status}` as any)}
                 </Badge>
 
+                {doc.signing_status && doc.signing_status !== "none" && (
+                  <Badge variant="outline" className="bg-accent/15 text-accent-foreground border-accent/30 text-xs">
+                    <PenTool className="h-3 w-3 mr-1" />
+                    {t(`docs.signing_${doc.signing_status}` as any)}
+                  </Badge>
+                )}
+
                 <div className="flex items-center gap-1 shrink-0">
                   {doc.file_path && (
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleDownload(doc.file_path, doc.file_name)}>
@@ -272,6 +299,19 @@ export function WorkerDocuments({ workerId, readOnly = false }: WorkerDocumentsP
                             <X className="h-4 w-4" />
                           </Button>
                         </>
+                      )}
+
+                      {doc.file_path && (doc.signing_status === "none" || !doc.signing_status) && doc.status !== "pending" && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-primary"
+                          disabled={sendingSignId === doc.id}
+                          onClick={() => handleSendForSigning(doc.id)}
+                          title={t("docs.sendForSigning" as any)}
+                        >
+                          {sendingSignId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenTool className="h-4 w-4" />}
+                        </Button>
                       )}
 
                       {!doc.is_required && (

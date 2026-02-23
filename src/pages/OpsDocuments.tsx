@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FileText, Upload, CheckCircle, XCircle, Download, Loader2 } from "lucide-react";
+import { FileText, Upload, CheckCircle, XCircle, Download, Loader2, PenTool } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 import { format } from "date-fns";
 
 const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -28,6 +29,23 @@ export default function OpsDocuments() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadTargetRef = useRef<string | null>(null);
+  const [sendingSignId, setSendingSignId] = useState<string | null>(null);
+
+  const handleSendForSigning = async (docId: string) => {
+    setSendingSignId(docId);
+    try {
+      const res = await supabase.functions.invoke("send-for-signing", {
+        body: { documentId: docId },
+      });
+      if (res.error) throw new Error(res.error.message);
+      queryClient.invalidateQueries({ queryKey: ["ops-all-documents"] });
+      toast({ title: "Sent for signing", description: "Document sent via SignWell." });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSendingSignId(null);
+    }
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["ops-all-documents"],
@@ -181,9 +199,10 @@ export default function OpsDocuments() {
                     <TableHead>Company</TableHead>
                     <TableHead>Order</TableHead>
                     <TableHead>Document</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Updated</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead>Signing</TableHead>
+                     <TableHead>Updated</TableHead>
+                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -207,6 +226,16 @@ export default function OpsDocuments() {
                         </TableCell>
                         <TableCell>
                           <Badge variant={s.variant}>{s.label}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {doc.signing_status && doc.signing_status !== "none" ? (
+                            <Badge variant="outline" className="text-xs">
+                              <PenTool className="h-3 w-3 mr-1" />
+                              {doc.signing_status}
+                            </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-xs">
                           {format(new Date(doc.updated_at), "dd MMM yyyy")}
@@ -239,6 +268,17 @@ export default function OpsDocuments() {
                                 title="Reject"
                               >
                                 <XCircle className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                            {doc.file_path && (!doc.signing_status || doc.signing_status === "none") && doc.status !== "pending" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                disabled={sendingSignId === doc.id}
+                                onClick={() => handleSendForSigning(doc.id)}
+                                title="Send for Signing"
+                              >
+                                {sendingSignId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenTool className="h-4 w-4 text-primary" />}
                               </Button>
                             )}
                           </div>
