@@ -166,6 +166,44 @@ export type Database = {
           },
         ]
       }
+      pipeline_stage_history: {
+        Row: {
+          changed_by: string
+          created_at: string
+          from_stage: Database["public"]["Enums"]["pipeline_stage"] | null
+          id: string
+          notes: string | null
+          to_stage: Database["public"]["Enums"]["pipeline_stage"]
+          worker_id: string
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string
+          from_stage?: Database["public"]["Enums"]["pipeline_stage"] | null
+          id?: string
+          notes?: string | null
+          to_stage: Database["public"]["Enums"]["pipeline_stage"]
+          worker_id: string
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string
+          from_stage?: Database["public"]["Enums"]["pipeline_stage"] | null
+          id?: string
+          notes?: string | null
+          to_stage?: Database["public"]["Enums"]["pipeline_stage"]
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_stage_history_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           company_id: string | null
@@ -231,6 +269,108 @@ export type Database = {
         }
         Relationships: []
       }
+      workers: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          company_id: string
+          created_at: string
+          current_stage: Database["public"]["Enums"]["pipeline_stage"]
+          cv_url: string | null
+          date_of_birth: string | null
+          email: string | null
+          first_name: string
+          flag_custom: string | null
+          flag_euprava: boolean | null
+          flag_visa_delay: boolean | null
+          id: string
+          last_name: string
+          nationality: string | null
+          order_id: string
+          passport_expiry: string | null
+          passport_number: string | null
+          phone: string | null
+          photo_url: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["worker_status"]
+          updated_at: string
+          visa_delay_estimate: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id: string
+          created_at?: string
+          current_stage?: Database["public"]["Enums"]["pipeline_stage"]
+          cv_url?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string
+          flag_custom?: string | null
+          flag_euprava?: boolean | null
+          flag_visa_delay?: boolean | null
+          id?: string
+          last_name?: string
+          nationality?: string | null
+          order_id: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["worker_status"]
+          updated_at?: string
+          visa_delay_estimate?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          company_id?: string
+          created_at?: string
+          current_stage?: Database["public"]["Enums"]["pipeline_stage"]
+          cv_url?: string | null
+          date_of_birth?: string | null
+          email?: string | null
+          first_name?: string
+          flag_custom?: string | null
+          flag_euprava?: boolean | null
+          flag_visa_delay?: boolean | null
+          id?: string
+          last_name?: string
+          nationality?: string | null
+          order_id?: string
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["worker_status"]
+          updated_at?: string
+          visa_delay_estimate?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workers_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -259,6 +399,22 @@ export type Database = {
         | "in_progress"
         | "fulfilled"
         | "cancelled"
+      pipeline_stage:
+        | "sourcing"
+        | "cv_screening"
+        | "cv_sent_to_client"
+        | "client_review"
+        | "interview_scheduled"
+        | "interview_completed"
+        | "approved_by_client"
+        | "documents_collection"
+        | "document_generation"
+        | "documents_signed"
+        | "visa_application"
+        | "police_interview"
+        | "visa_approved"
+        | "arrived"
+      worker_status: "active" | "rejected" | "withdrawn" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -396,6 +552,23 @@ export const Constants = {
         "fulfilled",
         "cancelled",
       ],
+      pipeline_stage: [
+        "sourcing",
+        "cv_screening",
+        "cv_sent_to_client",
+        "client_review",
+        "interview_scheduled",
+        "interview_completed",
+        "approved_by_client",
+        "documents_collection",
+        "document_generation",
+        "documents_signed",
+        "visa_application",
+        "police_interview",
+        "visa_approved",
+        "arrived",
+      ],
+      worker_status: ["active", "rejected", "withdrawn", "completed"],
     },
   },
 } as const

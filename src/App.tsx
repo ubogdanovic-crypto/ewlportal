@@ -14,6 +14,7 @@ import ManagementDashboard from "./pages/ManagementDashboard";
 import OrdersList from "./pages/OrdersList";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
+import CandidateReview from "./pages/CandidateReview";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -78,8 +79,12 @@ const App = () => (
                 <OrderDetail />
               </ProtectedRoute>
             } />
+            <Route path="/candidates/:id/review" element={
+              <ProtectedRoute allowedRoles={["client"]}>
+                <CandidateReview />
+              </ProtectedRoute>
+            } />
 
-            {/* Ops routes */}
             <Route path="/ops" element={
               <ProtectedRoute allowedRoles={["ops", "management"]}>
                 <OpsDashboard />
