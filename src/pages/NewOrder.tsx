@@ -65,7 +65,7 @@ const initialData: OrderFormData = {
 export default function NewOrder() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<OrderFormData>(initialData);
   const [loading, setLoading] = useState(false);
@@ -90,6 +90,7 @@ export default function NewOrder() {
       .from("orders")
       .insert({
         company_id: profile.company_id,
+        created_by: user!.id,
         position_title: form.position_title.trim(),
         job_description: form.job_description.trim(),
         requirements: form.requirements.trim(),
