@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WorkersPipelineTab } from "@/components/WorkersPipelineTab";
 import { toast } from "sonner";
+import { sendNotification, orderStatusEmail } from "@/lib/notifications";
 import { ArrowLeft, Loader2, Users, FileText, Bell, Clock, StickyNote, MessageSquare, Send } from "lucide-react";
 import { format } from "date-fns";
 
@@ -96,6 +97,28 @@ export default function OpsOrderDetail() {
     await supabase.from("orders").update(updates).eq("id", order.id);
     queryClient.invalidateQueries({ queryKey: ["ops-order", id] });
     toast.success(t("ops.statusUpdated"));
+
+    // Send notification to client company users
+    const companyName = (order.companies as any)?.name || "";
+    const statusText = t(`orders.status${newStatus.charAt(0).toUpperCase() + newStatus.slice(1).replace(/_./g, (m) => m[1].toUpperCase())}` as any);
+    const { subject, body } = orderStatusEmail(order.reference_number, statusText, companyName);
+
+    const { data: companyUsers } = await supabase
+      .from("profiles")
+      .select("user_id, email")
+      .eq("company_id", order.company_id);
+
+    (companyUsers || []).forEach((u: any) => {
+      sendNotification({
+        recipientEmail: u.email,
+        recipientUserId: u.user_id,
+        type: "order_status_change",
+        subject,
+        body,
+        entityType: "order",
+        entityId: order.id,
+      });
+    });
   };
 
   const statusLabel = (status: string) => {
