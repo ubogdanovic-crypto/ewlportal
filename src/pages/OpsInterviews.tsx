@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarDays, CalendarIcon, Loader2 } from "lucide-react";
+import { ArrowUpDown, CalendarDays, CalendarIcon, Loader2 } from "lucide-react";
 import { PipelineStageBadge } from "@/components/PipelineStage";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -34,6 +34,8 @@ export default function OpsInterviews() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [stageFilter, setStageFilter] = useState<string>("all");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const { data, isLoading } = useQuery({
     queryKey: ["ops-interviews"],
@@ -113,11 +115,13 @@ export default function OpsInterviews() {
 
   const interviews = data || [];
 
-  const stageBadgeVariant = (stage: string): "default" | "secondary" | "outline" => {
-    if (stage === "interview_completed") return "default";
-    if (stage === "interview_scheduled") return "secondary";
-    return "outline";
-  };
+  const filteredInterviews = interviews
+    .filter((w: any) => stageFilter === "all" || w.current_stage === stageFilter)
+    .sort((a: any, b: any) => {
+      const dateA = a.interview_date ? new Date(a.interview_date).getTime() : (sortDir === "asc" ? Infinity : -Infinity);
+      const dateB = b.interview_date ? new Date(b.interview_date).getTime() : (sortDir === "asc" ? Infinity : -Infinity);
+      return sortDir === "asc" ? dateA - dateB : dateB - dateA;
+    });
 
   return (
     <AppLayout>
@@ -127,11 +131,34 @@ export default function OpsInterviews() {
           <h1 className="text-2xl font-bold">{t("nav.interviews")}</h1>
         </div>
 
+        <div className="flex items-center gap-3 flex-wrap">
+          <Select value={stageFilter} onValueChange={setStageFilter}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filter by stage" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="all">All Stages</SelectItem>
+              <SelectItem value="client_review">Client Review</SelectItem>
+              <SelectItem value="interview_scheduled">Interview Scheduled</SelectItem>
+              <SelectItem value="interview_completed">Interview Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+            className="gap-1.5"
+          >
+            <ArrowUpDown className="h-4 w-4" />
+            Date {sortDir === "asc" ? "↑" : "↓"}
+          </Button>
+        </div>
+
         {isLoading ? (
           <div className="flex items-center justify-center py-12 text-muted-foreground">
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
-        ) : !interviews.length ? (
+        ) : !filteredInterviews.length ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-3">
               <CalendarDays className="h-10 w-10" />
@@ -151,11 +178,10 @@ export default function OpsInterviews() {
                     <TableHead>Interview Date</TableHead>
                     <TableHead>Last Updated</TableHead>
                     <TableHead>Update Stage</TableHead>
-                    <TableHead>Update Stage</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {interviews.map((w: any) => (
+                  {filteredInterviews.map((w: any) => (
                     <TableRow key={w.id}>
                       <TableCell
                         className="font-medium text-primary cursor-pointer hover:underline"
