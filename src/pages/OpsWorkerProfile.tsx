@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { sendNotification, workerStageEmail } from "@/lib/notifications";
-import { ArrowLeft, Loader2, User, Flag, StickyNote, Send } from "lucide-react";
+import { ArrowLeft, Loader2, User, Flag, StickyNote, Send, FileOutput } from "lucide-react";
 import { format } from "date-fns";
 import { WorkerDocuments } from "@/components/WorkerDocuments";
 
@@ -29,6 +29,31 @@ export default function OpsWorkerProfile() {
   const [stageNote, setStageNote] = useState("");
   const [newNote, setNewNote] = useState("");
   const [changingStage, setChangingStage] = useState(false);
+  const [generatingType, setGeneratingType] = useState<string | null>(null);
+
+  const GENERATE_TYPES = [
+    { key: "invitation_letter", labelKey: "docs.invitationLetter" },
+    { key: "work_contract", labelKey: "docs.workContract" },
+    { key: "job_offer", labelKey: "docs.jobOffer" },
+  ];
+
+  const handleGenerateDocument = useCallback(async (templateType: string) => {
+    if (!id) return;
+    setGeneratingType(templateType);
+    try {
+      const res = await supabase.functions.invoke("generate-document", {
+        body: { workerId: id, templateType },
+      });
+      if (res.error) throw new Error(res.error.message);
+      if (res.data?.error) throw new Error(res.data.error);
+      toast.success(t("docs.documentGenerated" as any));
+      queryClient.invalidateQueries({ queryKey: ["worker-documents", id] });
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setGeneratingType(null);
+    }
+  }, [id, queryClient, t]);
 
   const { data: worker, isLoading } = useQuery({
     queryKey: ["ops-worker", id],
@@ -249,6 +274,36 @@ export default function OpsWorkerProfile() {
               </div>
             ))}
             {notes.length === 0 && <p className="text-sm text-muted-foreground">{t("ops.noNotes")}</p>}
+          </CardContent>
+        </Card>
+
+        {/* Generate Documents */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <FileOutput className="h-5 w-5" />
+              {t("docs.generateDocuments" as any)}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">{t("docs.generateDocumentsDesc" as any)}</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {GENERATE_TYPES.map(({ key, labelKey }) => (
+              <div key={key} className="flex items-center justify-between border rounded-lg p-3">
+                <span className="text-sm font-medium">{t(labelKey as any)}</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={generatingType === key}
+                  onClick={() => handleGenerateDocument(key)}
+                >
+                  {generatingType === key ? (
+                    <><Loader2 className="h-4 w-4 animate-spin mr-1" />{t("docs.generating" as any)}</>
+                  ) : (
+                    <><FileOutput className="h-4 w-4 mr-1" />{t("docs.generate" as any)}</>
+                  )}
+                </Button>
+              </div>
+            ))}
           </CardContent>
         </Card>
 
