@@ -92,6 +92,51 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          error_message: string | null
+          id: string
+          notification_type: string
+          recipient_email: string
+          recipient_user_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          recipient_email: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          recipient_email?: string
+          recipient_user_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           accommodation_address: string | null

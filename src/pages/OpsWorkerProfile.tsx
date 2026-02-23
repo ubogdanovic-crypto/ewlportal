@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { sendNotification, workerStageEmail } from "@/lib/notifications";
 import { ArrowLeft, Loader2, User, Flag, StickyNote, Send } from "lucide-react";
 import { format } from "date-fns";
 import { WorkerDocuments } from "@/components/WorkerDocuments";
@@ -57,6 +58,8 @@ export default function OpsWorkerProfile() {
     enabled: !!id,
   });
 
+  const KEY_STAGES = ["approved_by_client", "documents_collection", "visa_application", "visa_approved", "arrived"];
+
   const handleStageChange = async (newStage: string) => {
     if (!worker || !user || newStage === worker.current_stage) return;
     setChangingStage(true);
@@ -77,6 +80,32 @@ export default function OpsWorkerProfile() {
     setChangingStage(false);
     queryClient.invalidateQueries({ queryKey: ["ops-worker", id] });
     queryClient.invalidateQueries({ queryKey: ["ops-worker-history", id] });
+
+    // Send email notification for key stages
+    if (KEY_STAGES.includes(newStage)) {
+      const workerName = `${worker.first_name} ${worker.last_name}`;
+      const orderRef = (worker.orders as any)?.reference_number || "";
+      const companyName = (worker.companies as any)?.name || "";
+      const stageText = t(`pipeline.${newStage}` as any);
+      const { subject, body } = workerStageEmail(workerName, orderRef, stageText, companyName);
+
+      const { data: companyUsers } = await supabase
+        .from("profiles")
+        .select("user_id, email")
+        .eq("company_id", worker.company_id);
+
+      (companyUsers || []).forEach((u: any) => {
+        sendNotification({
+          recipientEmail: u.email,
+          recipientUserId: u.user_id,
+          type: "worker_stage_change",
+          subject,
+          body,
+          entityType: "worker",
+          entityId: worker.id,
+        });
+      });
+    }
   };
 
   const handleFlagUpdate = async (field: string, value: any) => {
