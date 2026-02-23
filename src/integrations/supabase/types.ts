@@ -62,6 +62,36 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          body_html: string
+          created_at: string
+          id: string
+          lang: string
+          subject: string
+          trigger_event: string
+          updated_at: string
+        }
+        Insert: {
+          body_html?: string
+          created_at?: string
+          id?: string
+          lang: string
+          subject?: string
+          trigger_event: string
+          updated_at?: string
+        }
+        Update: {
+          body_html?: string
+          created_at?: string
+          id?: string
+          lang?: string
+          subject?: string
+          trigger_event?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       internal_notes: {
         Row: {
           content: string
@@ -243,6 +273,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pipeline_stage_config: {
+        Row: {
+          client_visible: boolean
+          color: string | null
+          created_at: string
+          id: string
+          label_en: string
+          label_sr: string
+          sort_order: number
+          stage_key: string
+          updated_at: string
+        }
+        Insert: {
+          client_visible?: boolean
+          color?: string | null
+          created_at?: string
+          id?: string
+          label_en?: string
+          label_sr?: string
+          sort_order?: number
+          stage_key: string
+          updated_at?: string
+        }
+        Update: {
+          client_visible?: boolean
+          color?: string | null
+          created_at?: string
+          id?: string
+          label_en?: string
+          label_sr?: string
+          sort_order?: number
+          stage_key?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       pipeline_stage_history: {
         Row: {
