@@ -83,6 +83,7 @@ export function AppSidebar() {
     { title: t("nav.orders"), url: "/orders", icon: ClipboardList },
     { title: t("nav.documents"), url: "/documents", icon: FileText },
     { title: t("nav.notifications"), url: "/notifications", icon: Bell, badge: unreadCount },
+    { title: t("profile.profileSettings"), url: "/profile", icon: Settings },
   ];
 
   const opsItems = [
