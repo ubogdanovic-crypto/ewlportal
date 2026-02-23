@@ -131,17 +131,17 @@ export default function OrdersList() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
+          <Card className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("orders.referenceNumber")}</TableHead>
                   <TableHead>{t("orders.position")}</TableHead>
-                  <TableHead className="text-center">{t("orders.workers")}</TableHead>
-                  <TableHead>{t("orders.sourceCountry")}</TableHead>
+                  <TableHead className="text-center hidden sm:table-cell">{t("orders.workers")}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t("orders.sourceCountry")}</TableHead>
                   <TableHead>{t("common.status")}</TableHead>
-                  <TableHead>{t("orders.createdAt")}</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead className="hidden sm:table-cell">{t("orders.createdAt")}</TableHead>
+                  <TableHead className="hidden sm:table-cell"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -152,18 +152,18 @@ export default function OrdersList() {
                     onClick={() => navigate(`/orders/${order.id}`)}
                   >
                     <TableCell className="font-medium text-primary">{order.reference_number}</TableCell>
-                    <TableCell>{order.position_title}</TableCell>
-                    <TableCell className="text-center">{order.number_of_workers}</TableCell>
-                    <TableCell>{order.source_country || "—"}</TableCell>
+                    <TableCell className="max-w-[120px] truncate">{order.position_title}</TableCell>
+                    <TableCell className="text-center hidden sm:table-cell">{order.number_of_workers}</TableCell>
+                    <TableCell className="hidden md:table-cell">{order.source_country || "—"}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={STATUS_COLORS[order.status] || ""}>
                         {statusLabel(order.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    <TableCell className="text-muted-foreground text-sm hidden sm:table-cell">
                       {format(new Date(order.created_at), "dd MMM yyyy")}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Button variant="ghost" size="sm">{t("common.viewDetails")}</Button>
                     </TableCell>
                   </TableRow>

@@ -31,6 +31,7 @@ import ManagementSettings from "./pages/ManagementSettings";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
+import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <SessionTimeoutWarning />
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
