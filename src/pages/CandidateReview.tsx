@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { PipelineStageBadge, PipelineProgress } from "@/components/PipelineStage";
+import { WorkerDocuments } from "@/components/WorkerDocuments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -209,6 +210,9 @@ export default function CandidateReview() {
             </CardContent>
           </Card>
         )}
+
+        {/* Documents (read-only for clients) */}
+        <WorkerDocuments workerId={worker.id} readOnly />
 
         {/* Action buttons */}
         {isReviewable && (
