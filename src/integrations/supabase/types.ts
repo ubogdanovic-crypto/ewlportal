@@ -472,6 +472,8 @@ export type Database = {
           label: string
           notes: string | null
           rejection_reason: string | null
+          signing_status: string | null
+          signwell_document_id: string | null
           status: string
           updated_at: string
           uploaded_at: string | null
@@ -491,6 +493,8 @@ export type Database = {
           label: string
           notes?: string | null
           rejection_reason?: string | null
+          signing_status?: string | null
+          signwell_document_id?: string | null
           status?: string
           updated_at?: string
           uploaded_at?: string | null
@@ -510,6 +514,8 @@ export type Database = {
           label?: string
           notes?: string | null
           rejection_reason?: string | null
+          signing_status?: string | null
+          signwell_document_id?: string | null
           status?: string
           updated_at?: string
           uploaded_at?: string | null

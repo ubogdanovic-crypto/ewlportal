@@ -350,5 +350,13 @@ export const en = {
     rejectionReasonPrompt: "Enter rejection reason:",
     customDocLabel: "Enter document name:",
     addCustom: "Add Document",
+    sendForSigning: "Send for Signing",
+    sentForSigning: "Sent for signing!",
+    signing_none: "Not sent",
+    signing_sent: "Sent for signing",
+    signing_viewed: "Viewed",
+    signing_signed: "Signed",
+    signing_declined: "Declined",
+    signing_expired: "Expired",
   },
 };

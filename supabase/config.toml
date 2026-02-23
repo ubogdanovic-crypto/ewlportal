@@ -1,1 +1,13 @@
 project_id = "hcgevhehpkhjdtbvwhhx"
+
+[functions.invite-user]
+verify_jwt = false
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.send-for-signing]
+verify_jwt = false
+
+[functions.signwell-webhook]
+verify_jwt = false
