@@ -28,6 +28,7 @@ import ClientDocuments from "./pages/ClientDocuments";
 import OpsInterviews from "./pages/OpsInterviews";
 import OpsDocuments from "./pages/OpsDocuments";
 import ManagementSettings from "./pages/ManagementSettings";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -105,6 +106,11 @@ const App = () => (
             <Route path="/notifications" element={
               <ProtectedRoute>
                 <Notifications />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
 
