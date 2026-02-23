@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,8 +8,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <header className="h-14 flex items-center border-b border-border px-4 bg-card">
+          <header className="h-14 flex items-center justify-between border-b border-border px-4 bg-card">
             <SidebarTrigger />
+            <NotificationBell />
           </header>
           <main className="flex-1 p-6 overflow-auto">
             {children}
