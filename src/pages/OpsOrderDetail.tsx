@@ -189,7 +189,7 @@ export default function OpsOrderDetail() {
           </TabsContent>
 
           <TabsContent value="workers" className="mt-4">
-            <WorkersPipelineTab orderId={order.id} />
+            <WorkersPipelineTab orderId={order.id} companyId={order.company_id} />
           </TabsContent>
 
           <TabsContent value="documents" className="mt-4">
