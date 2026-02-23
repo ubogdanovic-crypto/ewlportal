@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Select,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { ArrowUpDown, CalendarDays, CalendarIcon, Loader2 } from "lucide-react";
+import { ArrowUpDown, CalendarDays, CalendarIcon, Loader2, Search } from "lucide-react";
 import { PipelineStageBadge } from "@/components/PipelineStage";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -36,6 +37,7 @@ export default function OpsInterviews() {
   const queryClient = useQueryClient();
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["ops-interviews"],
@@ -116,7 +118,11 @@ export default function OpsInterviews() {
   const interviews = data || [];
 
   const filteredInterviews = interviews
-    .filter((w: any) => stageFilter === "all" || w.current_stage === stageFilter)
+    .filter((w: any) => {
+      const nameMatch = searchQuery === "" || `${w.first_name} ${w.last_name}`.toLowerCase().includes(searchQuery.toLowerCase());
+      const stageMatch = stageFilter === "all" || w.current_stage === stageFilter;
+      return nameMatch && stageMatch;
+    })
     .sort((a: any, b: any) => {
       const dateA = a.interview_date ? new Date(a.interview_date).getTime() : (sortDir === "asc" ? Infinity : -Infinity);
       const dateB = b.interview_date ? new Date(b.interview_date).getTime() : (sortDir === "asc" ? Infinity : -Infinity);
@@ -132,6 +138,15 @@ export default function OpsInterviews() {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 w-[200px]"
+            />
+          </div>
           <Select value={stageFilter} onValueChange={setStageFilter}>
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Filter by stage" />
