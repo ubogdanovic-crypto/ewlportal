@@ -190,6 +190,11 @@ export const sr = {
     candidateApproved: "Kandidat uspešno odobren!",
     candidateRejected: "Kandidat odbijen.",
     stageHistory: "Istorija faza",
+    addWorker: "Dodaj radnika",
+    firstName: "Ime",
+    lastName: "Prezime",
+    nameRequired: "Ime i prezime su obavezni",
+    workerAdded: "Radnik uspešno dodat",
   },
   ops: {
     dashboardTitle: "Operativna kontrolna tabla",

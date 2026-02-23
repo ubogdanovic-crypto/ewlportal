@@ -197,6 +197,11 @@ export const en = {
     candidateApproved: "Candidate approved successfully!",
     candidateRejected: "Candidate rejected.",
     stageHistory: "Stage History",
+    addWorker: "Add Worker",
+    firstName: "First Name",
+    lastName: "Last Name",
+    nameRequired: "First and last name are required",
+    workerAdded: "Worker added successfully",
   },
   ops: {
     dashboardTitle: "Operations Dashboard",
