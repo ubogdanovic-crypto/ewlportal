@@ -343,6 +343,74 @@ export type Database = {
         }
         Relationships: []
       }
+      worker_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          file_name: string | null
+          file_path: string | null
+          file_size: number | null
+          id: string
+          is_required: boolean
+          label: string
+          notes: string | null
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+          verified_at: string | null
+          verified_by: string | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_required?: boolean
+          label: string
+          notes?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          file_name?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_required?: boolean
+          label?: string
+          notes?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_documents_worker_id_fkey"
+            columns: ["worker_id"]
+            isOneToOne: false
+            referencedRelation: "workers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workers: {
         Row: {
           approved_at: string | null

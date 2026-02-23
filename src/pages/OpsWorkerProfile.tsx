@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, User, Flag, StickyNote, Send } from "lucide-react";
 import { format } from "date-fns";
+import { WorkerDocuments } from "@/components/WorkerDocuments";
 
 export default function OpsWorkerProfile() {
   const { t } = useTranslation();
@@ -221,6 +222,9 @@ export default function OpsWorkerProfile() {
             {notes.length === 0 && <p className="text-sm text-muted-foreground">{t("ops.noNotes")}</p>}
           </CardContent>
         </Card>
+
+        {/* Documents */}
+        <WorkerDocuments workerId={worker.id} />
 
         {/* Stage history */}
         <Card>
