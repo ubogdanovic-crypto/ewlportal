@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/AppLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, UserCog, Shield, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { Search, UserCog, Shield, Loader2, UserPlus } from "lucide-react";
 
 const ROLES = ["client", "ops", "management"] as const;
 
@@ -25,6 +24,12 @@ export default function ManagementUsers() {
   const [editUser, setEditUser] = useState<any>(null);
   const [editRole, setEditRole] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<string>("client");
+  const [inviteName, setInviteName] = useState("");
+  const [inviteCompanyId, setInviteCompanyId] = useState<string>("");
+  const [inviting, setInviting] = useState(false);
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["mgmt-users"],
@@ -42,6 +47,14 @@ export default function ManagementUsers() {
         role: roleMap[p.user_id] || "client",
         company_name: p.company_id ? companyMap[p.company_id] || "—" : "—",
       }));
+    },
+  });
+
+  const { data: companies = [] } = useQuery({
+    queryKey: ["mgmt-companies"],
+    queryFn: async () => {
+      const { data } = await supabase.from("companies").select("id, name").eq("is_active", true).order("name");
+      return data || [];
     },
   });
 
@@ -82,6 +95,33 @@ export default function ManagementUsers() {
     toast.success(t("ops.statusUpdated"));
   };
 
+  const handleInviteUser = async () => {
+    if (!inviteEmail.trim()) return;
+    setInviting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("invite-user", {
+        body: {
+          email: inviteEmail.trim(),
+          role: inviteRole,
+          company_id: inviteRole === "client" ? inviteCompanyId || null : null,
+          full_name: inviteName.trim(),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Invitation sent to ${inviteEmail}`);
+      setInviteOpen(false);
+      setInviteEmail("");
+      setInviteName("");
+      setInviteRole("client");
+      setInviteCompanyId("");
+      queryClient.invalidateQueries({ queryKey: ["mgmt-users"] });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to invite user");
+    }
+    setInviting(false);
+  };
+
   const ROLE_COLORS: Record<string, string> = {
     client: "bg-primary/15 text-primary border-primary/30",
     ops: "bg-accent/15 text-accent-foreground border-accent/30",
@@ -96,7 +136,13 @@ export default function ManagementUsers() {
             <UserCog className="h-6 w-6" />
             {t("mgmt.userManagement" as any)}
           </h1>
-          <Badge variant="secondary">{filtered.length} {t("mgmt.totalUsers" as any).toLowerCase()}</Badge>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setInviteOpen(true)} size="sm">
+              <UserPlus className="h-4 w-4 mr-1" />
+              Invite User
+            </Button>
+            <Badge variant="secondary">{filtered.length} {t("mgmt.totalUsers" as any).toLowerCase()}</Badge>
+          </div>
         </div>
 
         {/* Filters */}
@@ -196,6 +242,56 @@ export default function ManagementUsers() {
             <Button onClick={handleSaveRole} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               {t("common.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite user dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Invite New User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Full Name</Label>
+              <Input value={inviteName} onChange={(e) => setInviteName(e.target.value)} placeholder="John Doe" />
+            </div>
+            <div className="space-y-2">
+              <Label>Email *</Label>
+              <Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="user@example.com" />
+            </div>
+            <div className="space-y-2">
+              <Label>Role *</Label>
+              <Select value={inviteRole} onValueChange={setInviteRole}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {ROLES.map((r) => (
+                    <SelectItem key={r} value={r}>{t(`mgmt.role_${r}` as any)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {inviteRole === "client" && (
+              <div className="space-y-2">
+                <Label>Company</Label>
+                <Select value={inviteCompanyId} onValueChange={setInviteCompanyId}>
+                  <SelectTrigger><SelectValue placeholder="Select company" /></SelectTrigger>
+                  <SelectContent>
+                    {companies.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)}>Cancel</Button>
+            <Button onClick={handleInviteUser} disabled={inviting || !inviteEmail.trim()}>
+              {inviting && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+              Send Invitation
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -53,7 +53,7 @@ export function AppSidebar() {
       if (error) throw error;
       return count || 0;
     },
-    enabled: !!user,
+    enabled: !!user && !!role,
     refetchInterval: 30000,
   });
 
