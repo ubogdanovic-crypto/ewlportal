@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, ClipboardList, Users, AlertTriangle } from "lucide-react";
 import { PipelineStageBadge } from "@/components/PipelineStage";
 import { format } from "date-fns";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Constants } from "@/integrations/supabase/types";
 
 const ORDER_STATUS_COLORS: Record<string, string> = {
   draft: "bg-muted text-muted-foreground",
@@ -82,6 +84,43 @@ export default function OpsDashboard() {
             </Card>
           ))}
         </div>
+
+        {/* Workers by pipeline stage */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">{t("ops.workersByStage" as any, "Workers by Pipeline Stage")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              const allStages = Constants.public.Enums.pipeline_stage;
+              const stageCounts = allStages.map((stage) => ({
+                stage: stage.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+                count: workers.filter((w: any) => w.current_stage === stage).length,
+              }));
+              const colors = [
+                "hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--info))",
+                "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))",
+                "hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--info))",
+                "hsl(var(--warning))", "hsl(var(--success))", "hsl(var(--destructive))",
+                "hsl(var(--primary))", "hsl(var(--accent))",
+              ];
+              return (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stageCounts} layout="vertical" margin={{ left: 120 }}>
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis type="category" dataKey="stage" width={120} tick={{ fontSize: 12 }} />
+                    <Tooltip />
+                    <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                      {stageCounts.map((_, i) => (
+                        <Cell key={i} fill={colors[i % colors.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              );
+            })()}
+          </CardContent>
+        </Card>
 
         {/* Attention required */}
         {stalledWorkers.length > 0 && (
