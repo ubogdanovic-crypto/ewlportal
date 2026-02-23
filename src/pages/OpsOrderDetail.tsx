@@ -143,17 +143,17 @@ export default function OpsOrderDetail() {
   return (
     <AppLayout>
       <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/ops/orders")}><ArrowLeft className="h-5 w-5" /></Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">{order.reference_number}</h1>
-              <Badge variant="outline" className={STATUS_COLORS[order.status] || ""}>{statusLabel(order.status)}</Badge>
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
+          <Button variant="ghost" size="icon" className="shrink-0" onClick={() => navigate("/ops/orders")}><ArrowLeft className="h-5 w-5" /></Button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <h1 className="text-lg sm:text-2xl font-bold truncate">{order.reference_number}</h1>
+              <Badge variant="outline" className={`text-[10px] sm:text-xs shrink-0 ${STATUS_COLORS[order.status] || ""}`}>{statusLabel(order.status)}</Badge>
             </div>
-            <p className="text-muted-foreground">{order.position_title} · {(order.companies as any)?.name} · {order.number_of_workers} workers</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{order.position_title} · {(order.companies as any)?.name} · {order.number_of_workers} workers</p>
           </div>
           <Select value={order.status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-28 sm:w-40 shrink-0 text-xs sm:text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               {["draft", "submitted", "confirmed", "sourcing", "in_progress", "fulfilled", "cancelled"].map((s) => (
                 <SelectItem key={s} value={s}>{statusLabel(s)}</SelectItem>
@@ -163,7 +163,7 @@ export default function OpsOrderDetail() {
         </div>
 
         <Tabs defaultValue="overview">
-          <TabsList className="flex-wrap">
+          <TabsList className="w-full justify-start flex-nowrap">
             <TabsTrigger value="overview">{t("orders.overview")}</TabsTrigger>
             <TabsTrigger value="workers"><Users className="h-4 w-4 mr-1" />{t("orders.workersPipeline")}</TabsTrigger>
             <TabsTrigger value="documents"><FileText className="h-4 w-4 mr-1" />{t("orders.documents")}</TabsTrigger>
