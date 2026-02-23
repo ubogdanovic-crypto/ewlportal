@@ -34,7 +34,7 @@ export function NotificationBell() {
       if (error) throw error;
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!user && !!role,
   });
 
   const unreadCount = notifications.length;
