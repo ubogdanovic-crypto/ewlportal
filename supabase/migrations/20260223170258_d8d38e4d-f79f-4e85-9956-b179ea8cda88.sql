@@ -1,0 +1,1 @@
+ALTER TABLE public.workers ADD COLUMN interview_date date DEFAULT NULL;

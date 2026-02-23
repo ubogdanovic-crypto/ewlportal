@@ -16,10 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarDays, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarDays, CalendarIcon, Loader2 } from "lucide-react";
 import { PipelineStageBadge } from "@/components/PipelineStage";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const INTERVIEW_STAGES = [
   "interview_scheduled",
@@ -37,7 +40,7 @@ export default function OpsInterviews() {
     queryFn: async () => {
       const { data: workers, error } = await supabase
         .from("workers")
-        .select("id, first_name, last_name, current_stage, updated_at, order_id, company_id, status")
+        .select("id, first_name, last_name, current_stage, updated_at, order_id, company_id, status, interview_date")
         .in("current_stage", ["client_review", "interview_scheduled", "interview_completed"])
         .eq("status", "active")
         .order("updated_at", { ascending: false });
@@ -91,6 +94,23 @@ export default function OpsInterviews() {
     },
   });
 
+  const updateInterviewDate = useMutation({
+    mutationFn: async ({ workerId, date }: { workerId: string; date: Date | undefined }) => {
+      const { error } = await supabase
+        .from("workers")
+        .update({ interview_date: date ? format(date, "yyyy-MM-dd") : null } as any)
+        .eq("id", workerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ops-interviews"] });
+      toast({ title: "Date updated", description: "Interview date has been saved." });
+    },
+    onError: (err: any) => {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    },
+  });
+
   const interviews = data || [];
 
   const stageBadgeVariant = (stage: string): "default" | "secondary" | "outline" => {
@@ -128,7 +148,9 @@ export default function OpsInterviews() {
                     <TableHead>Company</TableHead>
                     <TableHead>Order</TableHead>
                     <TableHead>Current Stage</TableHead>
+                    <TableHead>Interview Date</TableHead>
                     <TableHead>Last Updated</TableHead>
+                    <TableHead>Update Stage</TableHead>
                     <TableHead>Update Stage</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -145,6 +167,35 @@ export default function OpsInterviews() {
                       <TableCell className="text-muted-foreground text-sm">{w.orderRef}</TableCell>
                       <TableCell>
                         <PipelineStageBadge stage={w.current_stage} size="sm" />
+                      </TableCell>
+                      <TableCell>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-[160px] justify-start text-left font-normal text-sm",
+                                !w.interview_date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {w.interview_date
+                                ? format(new Date(w.interview_date), "dd MMM yyyy")
+                                : "Pick date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={w.interview_date ? new Date(w.interview_date) : undefined}
+                              onSelect={(date) =>
+                                updateInterviewDate.mutate({ workerId: w.id, date })
+                              }
+                              initialFocus
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {format(new Date(w.updated_at), "dd MMM yyyy")}

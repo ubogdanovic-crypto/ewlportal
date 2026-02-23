@@ -474,6 +474,7 @@ export type Database = {
           flag_euprava: boolean | null
           flag_visa_delay: boolean | null
           id: string
+          interview_date: string | null
           last_name: string
           nationality: string | null
           order_id: string
@@ -502,6 +503,7 @@ export type Database = {
           flag_euprava?: boolean | null
           flag_visa_delay?: boolean | null
           id?: string
+          interview_date?: string | null
           last_name?: string
           nationality?: string | null
           order_id: string
@@ -530,6 +532,7 @@ export type Database = {
           flag_euprava?: boolean | null
           flag_visa_delay?: boolean | null
           id?: string
+          interview_date?: string | null
           last_name?: string
           nationality?: string | null
           order_id?: string
