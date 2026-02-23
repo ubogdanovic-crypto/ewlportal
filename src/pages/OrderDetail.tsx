@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WorkersPipelineTab } from "@/components/WorkersPipelineTab";
 import { ArrowLeft, Loader2, Users, FileText, Bell, Clock } from "lucide-react";
 import { format } from "date-fns";
 
@@ -173,7 +174,7 @@ export default function OrderDetail() {
           </TabsContent>
 
           <TabsContent value="workers" className="mt-4">
-            <Card><CardContent className="py-12 text-center text-muted-foreground">{t("orders.noWorkersYet")}</CardContent></Card>
+            <WorkersPipelineTab orderId={order.id} />
           </TabsContent>
 
           <TabsContent value="documents" className="mt-4">
