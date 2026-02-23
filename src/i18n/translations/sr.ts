@@ -68,6 +68,7 @@ export const sr = {
     workersArrived: "Pristigli radnici",
     recentNotifications: "Nedavna obaveštenja",
     placeNewOrder: "Napravi novu narudžbinu",
+    visaDelayTitle: "Detektovana kašnjenja viza",
   },
   orders: {
     title: "Moje narudžbine",
@@ -360,5 +361,28 @@ export const sr = {
     invitationLetter: "Pozivno pismo",
     workContract: "Ugovor o radu",
     jobOffer: "Ponuda za posao",
+  },
+  session: {
+    timeoutTitle: "Sesija ističe",
+    timeoutDesc: "Vaša sesija će isteći zbog neaktivnosti za",
+    stayLoggedIn: "Ostani prijavljen",
+  },
+  welcome: {
+    title: "Dobrodošli,",
+    subtitle: "Evo šta možete da radite na EWL Portalu:",
+    featureOrders: "Kreirajte i pratite narudžbine",
+    featureDocs: "Pregledajte dokumente radnika",
+    featureNotifications: "Primajte obaveštenja u realnom vremenu",
+    featureProfile: "Upravljajte profilom kompanije",
+    exploreLater: "Istraži kasnije",
+    placeFirstOrder: "Kreiraj prvu narudžbinu",
+  },
+  gdpr: {
+    deleteWorkerData: "Obriši podatke radnika (GDPR)",
+    deleteTitle: "Trajno brisanje podataka radnika",
+    deleteWarning: "Ovo će trajno obrisati sve podatke za {{name}}, uključujući dokumente, istoriju i beleške. Ova radnja se ne može poništiti.",
+    typeToConfirm: "Ukucajte za potvrdu:",
+    confirmDelete: "Trajno obriši",
+    workerDeleted: "Podaci radnika trajno obrisani.",
   },
 };

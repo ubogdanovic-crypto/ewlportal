@@ -43,13 +43,17 @@ export default function Notifications() {
       .map((n: any) => n.id);
     if (!unreadIds.length) return;
 
-    supabase
-      .from("notifications")
-      .update({ is_read: true } as any)
-      .in("id", unreadIds)
-      .then(() => {
-        queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
-      });
+    // Debounce to avoid race condition with realtime updates
+    const timeout = setTimeout(async () => {
+      await supabase
+        .from("notifications")
+        .update({ is_read: true } as any)
+        .in("id", unreadIds);
+      queryClient.invalidateQueries({ queryKey: ["unread-notifications-count"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications-bell"] });
+    }, 500);
+
+    return () => clearTimeout(timeout);
   }, [notifications, user, queryClient]);
 
   const handleMarkAllRead = async () => {

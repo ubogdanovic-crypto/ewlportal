@@ -19,6 +19,7 @@ import { sendNotification, workerStageEmail } from "@/lib/notifications";
 import { ArrowLeft, Loader2, User, Flag, StickyNote, Send, FileOutput } from "lucide-react";
 import { format } from "date-fns";
 import { WorkerDocuments } from "@/components/WorkerDocuments";
+import { GdprWorkerDeletion } from "@/components/GdprWorkerDeletion";
 
 export default function OpsWorkerProfile() {
   const { t } = useTranslation();
@@ -186,6 +187,7 @@ export default function OpsWorkerProfile() {
           <Badge variant="outline" className={worker.status === "active" ? "bg-success/15 text-success border-success/30" : "bg-destructive/15 text-destructive border-destructive/30"}>
             {t(`pipeline.status_${worker.status}` as any)}
           </Badge>
+          <GdprWorkerDeletion workerId={worker.id} workerName={`${worker.first_name} ${worker.last_name}`} />
         </div>
 
         {/* Pipeline progress */}

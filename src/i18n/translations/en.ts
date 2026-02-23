@@ -68,6 +68,7 @@ export const en = {
     workersArrived: "Workers Arrived",
     recentNotifications: "Recent Notifications",
     placeNewOrder: "Place New Order",
+    visaDelayTitle: "Visa Delays Detected",
   },
   orders: {
     title: "My Orders",
@@ -367,5 +368,28 @@ export const en = {
     invitationLetter: "Invitation Letter",
     workContract: "Work Contract",
     jobOffer: "Job Offer",
+  },
+  session: {
+    timeoutTitle: "Session Expiring",
+    timeoutDesc: "Your session will expire due to inactivity in",
+    stayLoggedIn: "Stay Logged In",
+  },
+  welcome: {
+    title: "Welcome,",
+    subtitle: "Here's what you can do on the EWL Portal:",
+    featureOrders: "Place & track recruitment orders",
+    featureDocs: "View worker documents",
+    featureNotifications: "Receive real-time updates",
+    featureProfile: "Manage your company profile",
+    exploreLater: "Explore Later",
+    placeFirstOrder: "Place First Order",
+  },
+  gdpr: {
+    deleteWorkerData: "Delete Worker Data (GDPR)",
+    deleteTitle: "Permanently Delete Worker Data",
+    deleteWarning: "This will permanently delete all data for {{name}}, including documents, pipeline history, and notes. This action cannot be undone.",
+    typeToConfirm: "Type to confirm:",
+    confirmDelete: "Permanently Delete",
+    workerDeleted: "Worker data permanently deleted.",
   },
 };

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { ClipboardList, Users, AlertCircle, CheckCircle2, Plus, ArrowRight } from "lucide-react";
+import { VisaDelayBanner } from "@/components/VisaDelayBanner";
+import { ClientWelcomeDialog } from "@/components/ClientWelcomeDialog";
 
 export default function ClientDashboard() {
   const { t } = useTranslation();
@@ -64,7 +66,9 @@ export default function ClientDashboard() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <ClientWelcomeDialog />
+        <VisaDelayBanner />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-foreground">{t("dashboard.title")}</h1>
           <Button onClick={() => navigate("/orders/new")} className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Plus className="mr-2 h-4 w-4" />
@@ -72,7 +76,7 @@ export default function ClientDashboard() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
             <Card key={stat.label}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
