@@ -11,6 +11,8 @@ import ResetPassword from "./pages/ResetPassword";
 import ClientDashboard from "./pages/ClientDashboard";
 import OpsDashboard from "./pages/OpsDashboard";
 import ManagementDashboard from "./pages/ManagementDashboard";
+import ManagementUsers from "./pages/ManagementUsers";
+import ManagementReports from "./pages/ManagementReports";
 import OrdersList from "./pages/OrdersList";
 import NewOrder from "./pages/NewOrder";
 import OrderDetail from "./pages/OrderDetail";
@@ -131,6 +133,16 @@ const App = () => (
             <Route path="/management" element={
               <ProtectedRoute allowedRoles={["management"]}>
                 <ManagementDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/management/users" element={
+              <ProtectedRoute allowedRoles={["management"]}>
+                <ManagementUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/management/reports" element={
+              <ProtectedRoute allowedRoles={["management"]}>
+                <ManagementReports />
               </ProtectedRoute>
             } />
 

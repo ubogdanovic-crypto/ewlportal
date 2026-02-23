@@ -52,6 +52,7 @@ export function AppSidebar() {
 
   const managementItems = [
     { title: t("nav.dashboard"), url: "/management", icon: LayoutDashboard },
+    { title: t("mgmt.userManagement" as any), url: "/management/users", icon: Users },
     { title: t("nav.reports"), url: "/management/reports", icon: BarChart3 },
     { title: t("nav.settings"), url: "/management/settings", icon: Settings },
   ];
