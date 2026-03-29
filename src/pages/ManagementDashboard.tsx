@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/AppLayout";
+import { MyTasksWidget } from "@/components/tasks/MyTasksWidget";
+import { CrmQuickView } from "@/components/crm/CrmQuickView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -160,6 +162,11 @@ export default function ManagementDashboard() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <MyTasksWidget />
+          <CrmQuickView />
         </div>
       </div>
     </AppLayout>

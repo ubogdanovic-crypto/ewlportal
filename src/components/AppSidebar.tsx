@@ -16,6 +16,9 @@ import {
   BarChart3,
   CalendarDays,
   LogOut,
+  Target,
+  CheckSquare,
+  Handshake,
 } from "lucide-react";
 import {
   Sidebar,
@@ -88,11 +91,13 @@ export function AppSidebar() {
 
   const opsItems = [
     { title: t("nav.dashboard"), url: "/ops", icon: LayoutDashboard },
+    { title: t("crm.leads"), url: "/crm/leads", icon: Target },
     { title: t("nav.clients"), url: "/ops/clients", icon: Building2 },
     { title: t("nav.orders"), url: "/ops/orders", icon: ClipboardList },
     { title: t("nav.workers"), url: "/ops/workers", icon: Users },
     { title: t("nav.interviews"), url: "/ops/interviews", icon: CalendarDays },
     { title: t("nav.documents"), url: "/ops/documents", icon: FileText },
+    { title: t("tasks.title"), url: "/tasks", icon: CheckSquare },
   ];
 
   const managementItems = [
@@ -102,9 +107,16 @@ export function AppSidebar() {
     { title: t("nav.settings"), url: "/management/settings", icon: Settings },
   ];
 
+  const partnerItems = [
+    { title: t("partner.dashboard"), url: "/partner", icon: LayoutDashboard },
+    { title: t("partner.orders"), url: "/partner", icon: ClipboardList },
+    { title: t("profile.profileSettings"), url: "/profile", icon: Settings },
+  ];
+
   let menuItems = clientItems;
   if (role === "ops") menuItems = opsItems;
   if (role === "management") menuItems = [...managementItems, ...opsItems];
+  if (role === "partner") menuItems = partnerItems;
 
   return (
     <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="icon">
@@ -123,7 +135,7 @@ export function AppSidebar() {
 
         <SidebarGroup>
           <SidebarGroupLabel>
-            {!collapsed && (role === "ops" ? "Operations" : role === "management" ? "Management" : "Portal")}
+            {!collapsed && (role === "ops" ? "Operations" : role === "management" ? "Management" : role === "partner" ? "Partner" : "Portal")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

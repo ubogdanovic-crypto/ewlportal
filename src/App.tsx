@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { OfflineBanner } from "@/components/common/OfflineBanner";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -29,6 +31,11 @@ import OpsInterviews from "./pages/OpsInterviews";
 import OpsDocuments from "./pages/OpsDocuments";
 import ManagementSettings from "./pages/ManagementSettings";
 import Profile from "./pages/Profile";
+import LeadsList from "./pages/crm/LeadsList";
+import LeadDetail from "./pages/crm/LeadDetail";
+import TasksPage from "./pages/tasks/TasksPage";
+import PartnerDashboard from "./pages/partner/PartnerDashboard";
+import PartnerOrderDetail from "./pages/partner/PartnerOrderDetail";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 import { SessionTimeoutWarning } from "@/components/SessionTimeoutWarning";
@@ -49,6 +56,7 @@ function RoleRedirect() {
   switch (role) {
     case "ops": return <Navigate to="/ops" replace />;
     case "management": return <Navigate to="/management" replace />;
+    case "partner": return <Navigate to="/partner" replace />;
     default: return <Navigate to="/dashboard" replace />;
   }
 }
@@ -60,7 +68,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <OfflineBanner />
           <SessionTimeoutWarning />
+          <ErrorBoundary>
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
@@ -185,8 +195,40 @@ const App = () => (
               </ProtectedRoute>
             } />
 
+            {/* CRM routes */}
+            <Route path="/crm/leads" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <LeadsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/crm/leads/:id" element={
+              <ProtectedRoute allowedRoles={["ops", "management"]}>
+                <LeadDetail />
+              </ProtectedRoute>
+            } />
+
+            {/* Tasks route */}
+            <Route path="/tasks" element={
+              <ProtectedRoute>
+                <TasksPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Partner routes */}
+            <Route path="/partner" element={
+              <ProtectedRoute allowedRoles={["partner"]}>
+                <PartnerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/partner/orders/:id" element={
+              <ProtectedRoute allowedRoles={["partner"]}>
+                <PartnerOrderDetail />
+              </ProtectedRoute>
+            } />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </ErrorBoundary>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

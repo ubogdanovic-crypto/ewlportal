@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_rules: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          trigger_type: string
+          trigger_condition: Json
+          action_type: string
+          action_config: Json
+          is_active: boolean
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          trigger_type: string
+          trigger_condition: Json
+          action_type: string
+          action_config: Json
+          is_active?: boolean
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          trigger_type?: string
+          trigger_condition?: Json
+          action_type?: string
+          action_config?: Json
+          is_active?: boolean
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           address: string | null
@@ -122,6 +164,104 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_activities: {
+        Row: {
+          id: string
+          lead_id: string
+          activity_type: string
+          content: string
+          outcome: string | null
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          lead_id: string
+          activity_type: string
+          content: string
+          outcome?: string | null
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          lead_id?: string
+          activity_type?: string
+          content?: string
+          outcome?: string | null
+          created_by?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      leads: {
+        Row: {
+          id: string
+          company_name: string
+          contact_person: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          source: string
+          status: string
+          owner_id: string | null
+          estimated_workers: number | null
+          estimated_revenue_eur: number | null
+          next_action: string | null
+          next_action_date: string | null
+          notes: string | null
+          lost_reason: string | null
+          converted_company_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_name: string
+          contact_person?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          source?: string
+          status?: string
+          owner_id?: string | null
+          estimated_workers?: number | null
+          estimated_revenue_eur?: number | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          lost_reason?: string | null
+          converted_company_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_name?: string
+          contact_person?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          source?: string
+          status?: string
+          owner_id?: string | null
+          estimated_workers?: number | null
+          estimated_revenue_eur?: number | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          lost_reason?: string | null
+          converted_company_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -190,6 +330,7 @@ export type Database = {
           notes: string | null
           number_of_workers: number
           other_benefits: string | null
+          partner_agency_id: string | null
           position_title: string
           reference_number: string
           requirements: string | null
@@ -221,6 +362,7 @@ export type Database = {
           notes?: string | null
           number_of_workers?: number
           other_benefits?: string | null
+          partner_agency_id?: string | null
           position_title?: string
           reference_number: string
           requirements?: string | null
@@ -252,6 +394,7 @@ export type Database = {
           notes?: string | null
           number_of_workers?: number
           other_benefits?: string | null
+          partner_agency_id?: string | null
           position_title?: string
           reference_number?: string
           requirements?: string | null
@@ -274,14 +417,93 @@ export type Database = {
           },
         ]
       }
+      partner_messages: {
+        Row: {
+          id: string
+          order_id: string
+          sender_id: string
+          content: string
+          attachment_path: string | null
+          attachment_name: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          sender_id: string
+          content: string
+          attachment_path?: string | null
+          attachment_name?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          sender_id?: string
+          content?: string
+          attachment_path?: string | null
+          attachment_name?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      partner_agencies: {
+        Row: {
+          id: string
+          name: string
+          country: string
+          contact_person: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          country: string
+          contact_person?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          country?: string
+          contact_person?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pipeline_stage_config: {
         Row: {
           client_visible: boolean
           color: string | null
           created_at: string
+          expected_duration_days: number | null
           id: string
           label_en: string
           label_sr: string
+          sla_warning_days: number | null
           sort_order: number
           stage_key: string
           updated_at: string
@@ -290,9 +512,11 @@ export type Database = {
           client_visible?: boolean
           color?: string | null
           created_at?: string
+          expected_duration_days?: number | null
           id?: string
           label_en?: string
           label_sr?: string
+          sla_warning_days?: number | null
           sort_order?: number
           stage_key: string
           updated_at?: string
@@ -301,9 +525,11 @@ export type Database = {
           client_visible?: boolean
           color?: string | null
           created_at?: string
+          expected_duration_days?: number | null
           id?: string
           label_en?: string
           label_sr?: string
+          sla_warning_days?: number | null
           sort_order?: number
           stage_key?: string
           updated_at?: string
@@ -357,7 +583,9 @@ export type Database = {
           id: string
           is_active: boolean
           notification_preferences: Json
+          partner_agency_id: string | null
           phone: string | null
+          preferences: Json
           preferred_language: string
           updated_at: string
           user_id: string
@@ -370,7 +598,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           notification_preferences?: Json
+          partner_agency_id?: string | null
           phone?: string | null
+          preferences?: Json
           preferred_language?: string
           updated_at?: string
           user_id: string
@@ -383,7 +613,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           notification_preferences?: Json
+          partner_agency_id?: string | null
           phone?: string | null
+          preferences?: Json
           preferred_language?: string
           updated_at?: string
           user_id?: string
@@ -441,6 +673,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tasks: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          entity_type: string | null
+          entity_id: string | null
+          assigned_to: string | null
+          status: string
+          priority: string
+          due_date: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          entity_type?: string | null
+          entity_id?: string | null
+          assigned_to?: string | null
+          status?: string
+          priority?: string
+          due_date?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          entity_type?: string | null
+          entity_id?: string | null
+          assigned_to?: string | null
+          status?: string
+          priority?: string
+          due_date?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -548,8 +831,10 @@ export type Database = {
           flag_custom: string | null
           flag_euprava: boolean | null
           flag_visa_delay: boolean | null
+          gender: string | null
           id: string
           interview_date: string | null
+          issuing_country: string | null
           last_name: string
           nationality: string | null
           order_id: string
@@ -557,6 +842,7 @@ export type Database = {
           passport_number: string | null
           phone: string | null
           photo_url: string | null
+          place_of_birth: string | null
           rejected_at: string | null
           rejected_by: string | null
           rejection_reason: string | null
@@ -577,8 +863,10 @@ export type Database = {
           flag_custom?: string | null
           flag_euprava?: boolean | null
           flag_visa_delay?: boolean | null
+          gender?: string | null
           id?: string
           interview_date?: string | null
+          issuing_country?: string | null
           last_name?: string
           nationality?: string | null
           order_id: string
@@ -586,6 +874,7 @@ export type Database = {
           passport_number?: string | null
           phone?: string | null
           photo_url?: string | null
+          place_of_birth?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
@@ -606,8 +895,10 @@ export type Database = {
           flag_custom?: string | null
           flag_euprava?: boolean | null
           flag_visa_delay?: boolean | null
+          gender?: string | null
           id?: string
           interview_date?: string | null
+          issuing_country?: string | null
           last_name?: string
           nationality?: string | null
           order_id?: string
@@ -615,6 +906,7 @@ export type Database = {
           passport_number?: string | null
           phone?: string | null
           photo_url?: string | null
+          place_of_birth?: string | null
           rejected_at?: string | null
           rejected_by?: string | null
           rejection_reason?: string | null
@@ -658,7 +950,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "client" | "ops" | "management"
+      app_role: "client" | "ops" | "management" | "partner"
       order_status:
         | "draft"
         | "submitted"

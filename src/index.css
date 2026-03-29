@@ -117,4 +117,11 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+  /* Safe area for iOS bottom nav */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }

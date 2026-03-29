@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/AppLayout";
+import { MyTasksWidget } from "@/components/tasks/MyTasksWidget";
+import { CrmQuickView } from "@/components/crm/CrmQuickView";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -191,6 +193,11 @@ export default function OpsDashboard() {
             </Table>
           </CardContent>
         </Card>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <MyTasksWidget />
+          <CrmQuickView />
+        </div>
       </div>
     </AppLayout>
   );

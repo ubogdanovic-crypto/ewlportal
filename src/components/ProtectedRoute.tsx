@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 
-type AppRole = "client" | "ops" | "management";
+type AppRole = "client" | "ops" | "management" | "partner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -30,6 +30,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
       client: "/dashboard",
       ops: "/ops",
       management: "/management",
+      partner: "/partner",
     };
     return <Navigate to={redirectMap[role] || "/dashboard"} replace />;
   }

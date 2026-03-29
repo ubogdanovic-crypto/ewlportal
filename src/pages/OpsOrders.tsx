@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useUrlFilters } from "@/hooks/useUrlFilters";
 import { AppLayout } from "@/components/AppLayout";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,8 +28,11 @@ const STATUS_COLORS: Record<string, string> = {
 export default function OpsOrders() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const filters = useUrlFilters({ status: "all" });
+  const [search, setSearch] = useState(filters.get("q"));
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const statusFilter = filters.get("status") || "all";
+  const setStatusFilter = (v: string) => filters.set("status", v);
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["ops-orders-all"],
@@ -48,8 +53,8 @@ export default function OpsOrders() {
 
   const filtered = orders.filter((o: any) => {
     if (statusFilter !== "all" && o.status !== statusFilter) return false;
-    if (search) {
-      const s = search.toLowerCase();
+    if (debouncedSearch) {
+      const s = debouncedSearch.toLowerCase();
       return o.position_title?.toLowerCase().includes(s) || o.reference_number?.toLowerCase().includes(s) || (o.companies as any)?.name?.toLowerCase().includes(s);
     }
     return true;

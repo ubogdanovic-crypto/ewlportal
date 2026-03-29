@@ -18,6 +18,8 @@ interface StageConfig {
   client_visible: boolean;
   color: string | null;
   sort_order: number;
+  expected_duration_days: number | null;
+  sla_warning_days: number | null;
 }
 
 export function PipelineStageConfig() {
@@ -47,6 +49,8 @@ export function PipelineStageConfig() {
           label_en: stage.label_en,
           client_visible: stage.client_visible,
           color: stage.color,
+          expected_duration_days: stage.expected_duration_days,
+          sla_warning_days: stage.sla_warning_days,
         })
         .eq("id", stage.id);
       if (error) throw error;
@@ -94,15 +98,17 @@ export function PipelineStageConfig() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          <div className="grid grid-cols-[2rem_1fr_1fr_5rem_4rem] gap-2 text-xs font-medium text-muted-foreground px-1">
+          <div className="grid grid-cols-[2rem_1fr_1fr_5rem_4rem_4rem_4rem] gap-2 text-xs font-medium text-muted-foreground px-1">
             <span>#</span>
             <span>Srpski</span>
             <span>English</span>
             <span>{t("settings.visible")}</span>
             <span>{t("settings.color")}</span>
+            <span>SLA (d)</span>
+            <span>Warn</span>
           </div>
           {stages?.map((stage) => (
-            <div key={stage.id} className="grid grid-cols-[2rem_1fr_1fr_5rem_4rem] gap-2 items-center">
+            <div key={stage.id} className="grid grid-cols-[2rem_1fr_1fr_5rem_4rem_4rem_4rem] gap-2 items-center">
               <span className="text-xs text-muted-foreground">{stage.sort_order}</span>
               <Input
                 value={getStageValue(stage, "label_sr") as string}
@@ -127,6 +133,22 @@ export function PipelineStageConfig() {
                 value={(getStageValue(stage, "color") as string) || "#6366f1"}
                 onChange={(e) => handleFieldChange(stage.id, "color", e.target.value)}
                 className="h-8 w-10 p-0.5 cursor-pointer"
+              />
+              <Input
+                type="number"
+                min="0"
+                placeholder="—"
+                value={(getStageValue(stage, "expected_duration_days") as number) ?? ""}
+                onChange={(e) => handleFieldChange(stage.id, "expected_duration_days", e.target.value ? parseInt(e.target.value) : null)}
+                className="h-8 text-sm w-14"
+              />
+              <Input
+                type="number"
+                min="0"
+                placeholder="—"
+                value={(getStageValue(stage, "sla_warning_days") as number) ?? ""}
+                onChange={(e) => handleFieldChange(stage.id, "sla_warning_days", e.target.value ? parseInt(e.target.value) : null)}
+                className="h-8 text-sm w-14"
               />
             </div>
           ))}

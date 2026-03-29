@@ -14,9 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WorkersPipelineTab } from "@/components/WorkersPipelineTab";
+import { STAGE_ORDER } from "@/components/PipelineStage";
 import { toast } from "sonner";
 import { sendNotification, orderStatusEmail } from "@/lib/notifications";
-import { ArrowLeft, Loader2, Users, FileText, Bell, Clock, StickyNote, MessageSquare, Send } from "lucide-react";
+import { ArrowLeft, Loader2, Users, FileText, Bell, Clock, StickyNote, MessageSquare, Send, FileOutput } from "lucide-react";
 import { format } from "date-fns";
 
 const STATUS_COLORS: Record<string, string> = {
@@ -192,8 +193,8 @@ export default function OpsOrderDetail() {
             <WorkersPipelineTab orderId={order.id} companyId={order.company_id} />
           </TabsContent>
 
-          <TabsContent value="documents" className="mt-4">
-            <Card><CardContent className="py-12 text-center text-muted-foreground">{t("orders.noDocumentsYet")}</CardContent></Card>
+          <TabsContent value="documents" className="mt-4 space-y-4">
+            <BulkDocGenCard orderId={order.id} />
           </TabsContent>
 
           <TabsContent value="notes" className="mt-4 space-y-4">
@@ -271,5 +272,98 @@ export default function OpsOrderDetail() {
         </Tabs>
       </div>
     </AppLayout>
+  );
+}
+
+function BulkDocGenCard({ orderId }: { orderId: string }) {
+  const { t } = useTranslation();
+  const [generating, setGenerating] = useState(false);
+  const [results, setResults] = useState<{ total: number; success: number; failed: string[] } | null>(null);
+
+  const handleBulkGenerate = async (templateType: string) => {
+    setGenerating(true);
+    setResults(null);
+
+    // Get all approved workers for this order
+    const { data: workers } = await supabase
+      .from("workers")
+      .select("id, first_name, last_name, current_stage")
+      .eq("order_id", orderId)
+      .eq("status", "active");
+
+    const eligible = (workers || []).filter((w: any) => {
+      const stageIdx = STAGE_ORDER.indexOf(w.current_stage);
+      const approvedIdx = STAGE_ORDER.indexOf("approved_by_client");
+      return stageIdx >= approvedIdx;
+    });
+
+    if (eligible.length === 0) {
+      toast.error("No approved workers found for this order.");
+      setGenerating(false);
+      return;
+    }
+
+    let success = 0;
+    const failed: string[] = [];
+
+    for (const worker of eligible) {
+      const res = await supabase.functions.invoke("generate-document", {
+        body: { workerId: worker.id, templateType },
+      });
+      if (res.error || res.data?.error) {
+        failed.push(`${worker.first_name} ${worker.last_name}: ${res.error?.message || res.data?.error}`);
+      } else {
+        success++;
+      }
+    }
+
+    setResults({ total: eligible.length, success, failed });
+    setGenerating(false);
+    if (success > 0) toast.success(`Generated ${templateType.replace(/_/g, " ")} for ${success} workers`);
+    if (failed.length > 0) toast.error(`${failed.length} failed`);
+  };
+
+  const TEMPLATE_TYPES = [
+    { key: "invitation_letter", label: t("docs.invitationLetter" as any) },
+    { key: "work_contract", label: t("docs.workContract" as any) },
+    { key: "job_offer", label: t("docs.jobOffer" as any) },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <FileOutput className="h-5 w-5" />
+          Bulk Document Generation
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          Generate documents for all approved workers in this order.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {TEMPLATE_TYPES.map(({ key, label }) => (
+            <Button
+              key={key}
+              variant="outline"
+              size="sm"
+              disabled={generating}
+              onClick={() => handleBulkGenerate(key)}
+            >
+              {generating ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <FileOutput className="h-4 w-4 mr-1" />}
+              Generate All: {label}
+            </Button>
+          ))}
+        </div>
+        {results && (
+          <div className="text-sm space-y-1">
+            <p className="text-success">{results.success}/{results.total} generated successfully</p>
+            {results.failed.map((f, i) => (
+              <p key={i} className="text-destructive text-xs">{f}</p>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

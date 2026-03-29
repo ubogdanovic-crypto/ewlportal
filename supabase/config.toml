@@ -1,4 +1,4 @@
-project_id = "hcgevhehpkhjdtbvwhhx"
+project_id = "zkgufnxjembsvszdaqnx"
 
 [functions.invite-user]
 verify_jwt = false
@@ -13,4 +13,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.generate-document]
+verify_jwt = false
+
+[functions.extract-passport-data]
+verify_jwt = false
+
+[functions.process-automation-rules]
 verify_jwt = false

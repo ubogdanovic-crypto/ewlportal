@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Building2, Bell, Users, ImageIcon, GitBranch, Mail, FileText } from "lucide-react";
+import { Settings, Building2, Bell, Users, ImageIcon, GitBranch, Mail, FileText, Zap } from "lucide-react";
 import { PipelineStageConfig } from "@/components/settings/PipelineStageConfig";
 import { EmailTemplateEditor } from "@/components/settings/EmailTemplateEditor";
 import { DocumentTemplateManager } from "@/components/settings/DocumentTemplateManager";
+import { AutomationRulesConfig } from "@/components/settings/AutomationRulesConfig";
 
 export default function ManagementSettings() {
   const { t } = useTranslation();
@@ -26,7 +27,7 @@ export default function ManagementSettings() {
         </div>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="general" className="text-xs sm:text-sm">
               <Building2 className="h-4 w-4 mr-1 hidden sm:inline" />
               {t("settings.general")}
@@ -42,6 +43,10 @@ export default function ManagementSettings() {
             <TabsTrigger value="documents" className="text-xs sm:text-sm">
               <FileText className="h-4 w-4 mr-1 hidden sm:inline" />
               {t("settings.documents")}
+            </TabsTrigger>
+            <TabsTrigger value="automation" className="text-xs sm:text-sm">
+              <Zap className="h-4 w-4 mr-1 hidden sm:inline" />
+              Automation
             </TabsTrigger>
           </TabsList>
 
@@ -146,6 +151,11 @@ export default function ManagementSettings() {
           {/* Document Templates Tab */}
           <TabsContent value="documents" className="mt-6">
             <DocumentTemplateManager />
+          </TabsContent>
+
+          {/* Automation Rules Tab */}
+          <TabsContent value="automation" className="mt-6">
+            <AutomationRulesConfig />
           </TabsContent>
         </Tabs>
       </div>

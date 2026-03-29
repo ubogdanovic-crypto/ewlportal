@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
+import { MyTasksWidget } from "@/components/tasks/MyTasksWidget";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,6 +126,8 @@ export default function ClientDashboard() {
             )}
           </CardContent>
         </Card>
+
+        <MyTasksWidget />
       </div>
     </AppLayout>
   );
