@@ -121,7 +121,13 @@ export default function OpsWorkers() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">{t("ops.allWorkers")}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">{t("ops.allWorkers")}</h1>
+          <Button onClick={() => navigate("/ops/orders")} variant="outline" size="sm">
+            <Plus className="h-4 w-4 mr-1" />
+            {t("pipeline.addWorker")}
+          </Button>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1 max-w-sm">
