@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PipelineStageBadge, STAGE_ORDER } from "@/components/PipelineStage";
 import { BulkActionBar } from "@/components/common/BulkActionBar";
-import { Search, Users, ArrowRight, Loader2 } from "lucide-react";
+import { Search, Users, ArrowRight, Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export default function OpsWorkers() {
