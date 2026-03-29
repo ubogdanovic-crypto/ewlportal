@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { AppLayout } from "@/components/AppLayout";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ export default function OpsClients() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 300);
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ["ops-companies"],
@@ -24,7 +26,6 @@ export default function OpsClients() {
     },
   });
 
-  // Get order counts per company
   const { data: orderCounts = {} } = useQuery({
     queryKey: ["ops-company-order-counts"],
     queryFn: async () => {
@@ -40,16 +41,14 @@ export default function OpsClients() {
   });
 
   const filtered = companies.filter((c: any) =>
-    !search || c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.city?.toLowerCase().includes(search.toLowerCase())
+    !debouncedSearch || c.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+    c.city?.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t("ops.allClients")}</h1>
-        </div>
+        <h1 className="text-2xl font-bold">{t("ops.allClients")}</h1>
 
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -59,51 +58,84 @@ export default function OpsClients() {
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">{t("common.loading")}</div>
         ) : (
-          <Card>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("ops.companyName")}</TableHead>
-                  <TableHead>{t("ops.city")}</TableHead>
-                  <TableHead>{t("ops.contactPerson")}</TableHead>
-                  <TableHead className="text-center">{t("ops.totalOrders")}</TableHead>
-                  <TableHead className="text-center">{t("ops.activeOrders")}</TableHead>
-                  <TableHead>{t("common.status")}</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((company: any) => {
-                  const counts = (orderCounts as any)[company.id] || { total: 0, active: 0 };
-                  return (
-                    <TableRow key={company.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/ops/clients/${company.id}`)}>
-                      <TableCell className="font-medium">{company.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{company.city || "—"}</TableCell>
-                      <TableCell className="text-muted-foreground">{company.contact_person || "—"}</TableCell>
-                      <TableCell className="text-center">{counts.total}</TableCell>
-                      <TableCell className="text-center font-medium">{counts.active}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={company.is_active ? "bg-success/15 text-success border-success/30" : "bg-muted text-muted-foreground"}>
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-2">
+              {filtered.map((company: any) => {
+                const counts = (orderCounts as any)[company.id] || { total: 0, active: 0 };
+                return (
+                  <Card key={company.id} className="cursor-pointer" onClick={() => navigate(`/ops/clients/${company.id}`)}>
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium">{company.name}</p>
+                        <Badge variant="outline" className={company.is_active ? "bg-success/15 text-success border-success/30 text-xs" : "bg-muted text-muted-foreground text-xs"}>
                           {company.is_active ? t("ops.statusActive") : t("ops.statusInactive")}
                         </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{company.city || "—"} · {company.contact_person || "—"}</p>
+                      <div className="flex gap-3 mt-1.5 text-xs">
+                        <span>{counts.total} {t("ops.totalOrders").toLowerCase()}</span>
+                        <span className="font-medium">{counts.active} {t("ops.activeOrders").toLowerCase()}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {filtered.length === 0 && (
+                <div className="text-center py-12">
+                  <Building2 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-2" />
+                  <p className="text-muted-foreground">{t("common.noResults")}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table */}
+            <Card className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("ops.companyName")}</TableHead>
+                    <TableHead>{t("ops.city")}</TableHead>
+                    <TableHead>{t("ops.contactPerson")}</TableHead>
+                    <TableHead className="text-center">{t("ops.totalOrders")}</TableHead>
+                    <TableHead className="text-center">{t("ops.activeOrders")}</TableHead>
+                    <TableHead>{t("common.status")}</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((company: any) => {
+                    const counts = (orderCounts as any)[company.id] || { total: 0, active: 0 };
+                    return (
+                      <TableRow key={company.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/ops/clients/${company.id}`)}>
+                        <TableCell className="font-medium">{company.name}</TableCell>
+                        <TableCell className="text-muted-foreground">{company.city || "—"}</TableCell>
+                        <TableCell className="text-muted-foreground">{company.contact_person || "—"}</TableCell>
+                        <TableCell className="text-center">{counts.total}</TableCell>
+                        <TableCell className="text-center font-medium">{counts.active}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={company.is_active ? "bg-success/15 text-success border-success/30" : "bg-muted text-muted-foreground"}>
+                            {company.is_active ? t("ops.statusActive") : t("ops.statusInactive")}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm"><Eye className="h-4 w-4" /></Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  {filtered.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-12">
+                        <Building2 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-2" />
+                        <p className="text-muted-foreground">{t("common.noResults")}</p>
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-                {filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12">
-                      <Building2 className="mx-auto h-10 w-10 text-muted-foreground/40 mb-2" />
-                      <p className="text-muted-foreground">{t("common.noResults")}</p>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Card>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </>
         )}
       </div>
     </AppLayout>

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useUrlFilters } from "@/hooks/useUrlFilters";
 import { AppLayout } from "@/components/AppLayout";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,31 @@ export default function OpsOrders() {
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">{t("common.loading")}</div>
         ) : (
-          <Card>
+          <>
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-2">
+            {filtered.map((order: any) => (
+              <Card key={order.id} className="cursor-pointer" onClick={() => navigate(`/ops/orders/${order.id}`)}>
+                <CardContent className="p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-primary">{order.reference_number}</span>
+                    <Badge variant="outline" className={STATUS_COLORS[order.status] || ""}>{statusLabel(order.status)}</Badge>
+                  </div>
+                  <p className="text-sm mt-1">{order.position_title}</p>
+                  <p className="text-xs text-muted-foreground">{(order.companies as any)?.name || "—"} · {order.number_of_workers} workers · {order.source_country || "—"}</p>
+                </CardContent>
+              </Card>
+            ))}
+            {filtered.length === 0 && (
+              <div className="text-center py-12">
+                <ClipboardList className="mx-auto h-10 w-10 text-muted-foreground/40 mb-2" />
+                <p className="text-muted-foreground">{t("common.noResults")}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table */}
+          <Card className="hidden md:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -123,6 +147,7 @@ export default function OpsOrders() {
               </TableBody>
             </Table>
           </Card>
+          </>
         )}
       </div>
     </AppLayout>

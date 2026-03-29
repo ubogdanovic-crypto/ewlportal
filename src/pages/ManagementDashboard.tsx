@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppLayout } from "@/components/AppLayout";
 import { MyTasksWidget } from "@/components/tasks/MyTasksWidget";
 import { CrmQuickView } from "@/components/crm/CrmQuickView";
+import { LeadFunnelChart } from "@/components/crm/LeadFunnelChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -168,6 +169,8 @@ export default function ManagementDashboard() {
           <MyTasksWidget />
           <CrmQuickView />
         </div>
+
+        <LeadFunnelChart />
       </div>
     </AppLayout>
   );

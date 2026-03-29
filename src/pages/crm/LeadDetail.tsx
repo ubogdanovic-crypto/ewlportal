@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Phone, Mail, MessageSquare, StickyNote, Users as UsersIcon, Send, Loader2, Calendar } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Phone, Mail, MessageSquare, StickyNote, Users as UsersIcon, Send, Loader2, Calendar, Building2, CheckSquare, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -51,6 +52,11 @@ export default function LeadDetail() {
   const [activityOutcome, setActivityOutcome] = useState("");
   const [savingActivity, setSavingActivity] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [converting, setConverting] = useState(false);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState("");
+  const [savingTask, setSavingTask] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
     if (!id) return;
@@ -85,6 +91,55 @@ export default function LeadDetail() {
     const { error } = await supabase.from("leads").update({ [field]: value }).eq("id", id);
     if (error) toast.error(error.message);
     else queryClient.invalidateQueries({ queryKey: queryKeys.leads.detail(id) });
+  };
+
+  const handleConvertToClient = async () => {
+    if (!lead || !id) return;
+    setConverting(true);
+    // Create company from lead
+    const { data: company, error: companyErr } = await supabase.from("companies").insert({
+      name: lead.company_name,
+      contact_person: lead.contact_person,
+      contact_email: lead.contact_email,
+      contact_phone: lead.contact_phone,
+      is_active: true,
+    }).select("id").single();
+
+    if (companyErr || !company) {
+      toast.error(companyErr?.message || "Failed to create company");
+      setConverting(false);
+      return;
+    }
+
+    // Update lead status and link to company
+    await supabase.from("leads").update({
+      status: "won",
+      converted_company_id: company.id,
+    }).eq("id", id);
+
+    setConverting(false);
+    toast.success(t("crm.converted"));
+    queryClient.invalidateQueries({ queryKey: queryKeys.leads.detail(id) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.leads.all });
+  };
+
+  const handleCreateTask = async () => {
+    if (!taskTitle.trim() || !user || !id) return;
+    setSavingTask(true);
+    const { error } = await supabase.from("tasks").insert({
+      title: taskTitle.trim(),
+      entity_type: "lead",
+      entity_id: id,
+      assigned_to: user.id,
+      due_date: taskDueDate || null,
+      created_by: user.id,
+    });
+    setSavingTask(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(t("tasks.taskCreated"));
+    setTaskTitle("");
+    setTaskDueDate("");
+    setTaskDialogOpen(false);
   };
 
   if (isLoading || !lead) {
@@ -286,9 +341,73 @@ export default function LeadDetail() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Actions */}
+            <Card>
+              <CardContent className="pt-4 space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setTaskDialogOpen(true)}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t("tasks.newTask")}
+                </Button>
+                {lead.status !== "won" && lead.status !== "lost" && (
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    onClick={handleConvertToClient}
+                    disabled={converting}
+                  >
+                    {converting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Building2 className="h-4 w-4 mr-1" />}
+                    {t("crm.convertToClient")}
+                  </Button>
+                )}
+                {lead.converted_company_id && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-success"
+                    onClick={() => navigate(`/ops/clients/${lead.converted_company_id}`)}
+                  >
+                    <Building2 className="h-4 w-4 mr-1" />
+                    View Client
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
+
+      {/* Task Dialog */}
+      <Dialog open={taskDialogOpen} onOpenChange={setTaskDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("tasks.newTask")}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label>{t("tasks.title")} *</Label>
+              <Input value={taskTitle} onChange={(e) => setTaskTitle(e.target.value)} placeholder={`e.g. Follow up with ${lead.contact_person || lead.company_name}`} />
+            </div>
+            <div className="space-y-2">
+              <Label>{t("tasks.dueDate")}</Label>
+              <Input type="date" value={taskDueDate} onChange={(e) => setTaskDueDate(e.target.value)} />
+            </div>
+            <p className="text-xs text-muted-foreground">{t("tasks.linkedTo")}: {lead.company_name}</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTaskDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleCreateTask} disabled={savingTask || !taskTitle.trim()}>
+              {savingTask && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {t("common.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
