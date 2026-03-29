@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { sendNotification, workerStageEmail } from "@/lib/notifications";
 import { ArrowLeft, Loader2, User, Flag, StickyNote, Send, FileOutput } from "lucide-react";
+import { SlaIndicator } from "@/components/common/SlaIndicator";
 import { format } from "date-fns";
 import { WorkerDocuments } from "@/components/WorkerDocuments";
 import { GdprWorkerDeletion } from "@/components/GdprWorkerDeletion";
@@ -190,8 +191,9 @@ export default function OpsWorkerProfile() {
           <GdprWorkerDeletion workerId={worker.id} workerName={`${worker.first_name} ${worker.last_name}`} />
         </div>
 
-        {/* Pipeline progress */}
+        {/* Pipeline progress + SLA */}
         <PipelineProgress currentStage={worker.current_stage} />
+        <SlaIndicator stage={worker.current_stage} stageEnteredAt={worker.updated_at} />
 
         {/* Stage selector (ops) */}
         <Card>
