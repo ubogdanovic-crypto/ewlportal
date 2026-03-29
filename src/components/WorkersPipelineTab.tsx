@@ -194,7 +194,7 @@ export function WorkersPipelineTab({ orderId, companyId }: WorkersPipelineTabPro
           <div className="text-sm text-muted-foreground">
             {workers.filter(w => w.status === 'active').length} {t("pipeline.activeWorkers")} · {workers.filter(w => w.status === 'rejected').length} {t("pipeline.rejected")}
           </div>
-          <Dialog open={open} onOpenChange={(v) => {
+          {companyId && <Dialog open={open} onOpenChange={(v) => {
             setOpen(v);
             if (!v) {
               setForm({ firstName: "", lastName: "", nationality: "", passportNumber: "", dateOfBirth: "", passportExpiry: "" });
@@ -299,7 +299,7 @@ export function WorkersPipelineTab({ orderId, companyId }: WorkersPipelineTabPro
                 </Button>
               </div>
             </DialogContent>
-          </Dialog>
+          </Dialog>}
         </CardContent>
       </Card>
 
